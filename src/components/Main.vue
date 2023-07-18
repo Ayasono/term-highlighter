@@ -32,9 +32,9 @@ const pairTxtHighlighted = computed(() => {
 		// get a random color
 		const color = randomBrightColor()
 
-		left = left.replaceAll(leftKeys, `<span style='background-color: ${color}; border-radius: 3px' data-explain='${leftKeys}'>${leftKeys}</span>`)
+		left = left.replace(leftKeys, `<span style='background-color: ${color}; border-radius: 3px' data-explain='${leftKeys}'>${leftKeys}</span>`)
 
-		right = right.replaceAll(rightKeys, `<span style='background-color: ${color}; border-radius: 3px' data-explain='${rightKeys}'>${rightKeys}</span>`)
+		right = right.replace(rightKeys, `<span style='background-color: ${color}; border-radius: 3px' data-explain='${rightKeys}'>${rightKeys}</span>`)
 
 		counter ++
 	}
