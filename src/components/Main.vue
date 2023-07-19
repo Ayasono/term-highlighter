@@ -1,36 +1,21 @@
 <script setup>
 import { NSpace, NTable } from 'naive-ui'
-import { computed, reactive, ref } from 'vue'
+import { computed, ref } from 'vue'
+import { leftTxt, rightTxt, similarTerms, explainerLeft, explainerRight } from '../mock/index.js'
 
-let leftTxt = "A method comprising: \n selecting a multimedia presentation to be transmitted from a sending communication device to a receiving communication device"
-
-let rightTxt = "4 System description \n" +
-	"The control related elements are session establishment, capability exchange and session control (see clause 5). \n" +
-	"- Session establishment refers to methods to invoke a PSS session from a browser or directly by entering an URL in the terminal's user interface.\n" +
-	"- Capability exchange enables choice or adaptation of media streams depending on different terminal capabilities. \n" +
-	"- Session control deals with the set-up of the individual media streams between a PSS client and one or several PSS servers.It also enables control of the individual media streams by the user. It may involve VCR-like presentation control functions like start, pause, fast forward and stop of a media presentation."
-
-const terms = {
-	"a multimedia presentation": "media stream",
-	"sending communication device": "PSS servers",
-	"a receiving communication device": "PSS client",
-}
-
-let explainerLeft = reactive({})
-let explainerRight = reactive({})
 let explainerStrLeft = ref("")
 let explainerStrRight = ref("")
-
-initExplainers()
 
 const pairTxtHighlighted = computed(() => {
 	let left = leftTxt
 	let right = rightTxt
 	let counter = 1
 
-	for (const [leftKeys, rightKeys] of Object.entries(terms)) {
+	for (const similarTerm of similarTerms) {
 		// get a random color
 		const color = randomBrightColor()
+		let leftKeys = Object.keys(similarTerm)[0]
+		let rightKeys = similarTerm[leftKeys]
 
 		left = left.replace(leftKeys, `<span style='background-color: ${color}; border-radius: 3px' data-explain='${leftKeys}'>${leftKeys}</span>`)
 
@@ -50,14 +35,14 @@ function handleClick ($e) {
 		if (key in explainerLeft) {
 			// 左边的, 同时找到右边的
 			explainerStrLeft.value = explainerLeft[key]
-			const rightKey = terms[key]
+			const rightKey = similarTerms.find(item => item[key])[key]
 			explainerStrRight.value = explainerRight[rightKey]
 		} else if (key in explainerRight) {
 			explainerStrRight.value = explainerRight[key]
-			const leftKey = Object.keys(terms).find(k => terms[k] === key)
+			const leftKey = Object.keys(similarTerms.find(item => Object.values(item)[0] === key))[0]
 			explainerStrLeft.value = explainerLeft[leftKey]
 		} else {
-			console.log('No explainer found')
+			console.error('No explainer found')
 		}
 	}
 }
@@ -74,15 +59,6 @@ function randomBrightColor () {
 	return `rgb(${r}, ${g}, ${b})`
 }
 
-function initExplainers () {
-	let counter = 1
-	for (const [leftKeys, rightKeys] of Object.entries(terms)) {
-		explainerLeft[leftKeys] = `This is the #${counter} explanation for ${leftKeys}`
-		explainerRight[rightKeys] = `This is the #${counter} explanation for ${rightKeys}`
-		counter ++
-	}
-}
-
 </script>
 
 <template>
@@ -90,6 +66,7 @@ function initExplainers () {
 		<NTable size='large'
 		        :bordered='false'
 		        :single-line='false'
+		        :striped='true'
 		        class='table'>
 			<thead>
 			<tr>
@@ -99,7 +76,7 @@ function initExplainers () {
 			</thead>
 
 			<tbody>
-			<tr style='white-space: pre-line'>
+			<tr style='white-space: pre-line;'>
 				<td v-html='pairTxtHighlighted.left'
 				    @click='handleClick'>
 				</td>
@@ -109,7 +86,7 @@ function initExplainers () {
 				</td>
 			</tr>
 			<tr>
-				<td>
+				<td :style='{width: "50%"}'>
 					{{ explainerStrLeft ? explainerStrLeft : 'Click on a highlighted term to see the explanation' }}
 				</td>
 
